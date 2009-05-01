@@ -1,0 +1,9 @@
+[Gedit Plugin]
+Loader=python
+Module=highlight_selected
+IAge=2
+Name=Highlight Selected
+Description=Instantly highlights all occurrences of the selected text within a document.
+Authors=Steve Love, Jonathan Walsh, Jesse van den Kieboom
+Copyright= GNU GPL
+Website=http://www.stevelove.org
