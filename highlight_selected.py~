@@ -1,8 +1,8 @@
 #    Highlight Selected - Gedit plugin
 #    Copyright (C) 2009 Steve Love
-#    The basic structure of this plugin comes from Jonathan Walsh's multi-
-#    edit plugin and Jesse van den Kieboom's plugin example. All I really did
-#    was change the event handlers and remove the bits I didn't need.
+#	 The basic structure of this plugin comes from Jonathan Walsh's multi-
+#	 edit plugin and Jesse van den Kieboom's plugin example. All I really did
+#	 was change the event handlers and remove the bits I didn't need.
 #    
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
