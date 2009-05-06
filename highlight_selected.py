@@ -24,6 +24,8 @@ class WindowInstance:
 		self._window = window
 		self._plugin = plugin
 		self._tab 	 = None
+		self._start  = None
+		self._end	 = None
 		# Tab change handler
 		self._tab_event = self._window.connect('active-tab-changed', self._tab_change)
 		# Load the currently active tab
@@ -44,22 +46,47 @@ class WindowInstance:
 			
 			# Event handlers
 			self._selection_change = self._buffer.connect('notify::has-selection', self._selection_changed)
+			self._mark_move = self._buffer.connect('mark-set', self._mark_moved)
 			
 	def _destroy_settings(self):
 		# Disconnect event handlers
-		self._buffer.disconnect(self._selection_change)
+		self._buffer.disconnect(self._mark_move)
 		
 		# Destroy references to previous tab
 		del self._tab
 		del self._buffer
-		
+	
 	def _selection_changed(self, *args):
 		if(self._buffer.get_has_selection()):
 			start, end = self._buffer.get_selection_bounds()
+			self._highlight_selected(start, end)
+		else:
+			self._remove_highlight()
+		
+	def _mark_moved(self, textbuffer, textiter, mark):
+		if (mark.get_name() == 'insert'):
+			pos = self._buffer.get_iter_at_mark(mark)
+			self._end = pos
+			if (self._start != None and self._start != self._end):
+				self._highlight_selected(self._start, self._end)
+			else:
+				self._start = None
+				self._end   = None
+		elif (mark.get_name() == 'selection_bound'):
+			pos = self._buffer.get_iter_at_mark(mark)
+			self._start = pos
+		else:
+			return False
+	
+	def _highlight_selected(self, start, end):
+		if(self._buffer.get_has_selection()):
 			selected_text = self._buffer.get_text(start, end)
 			self._buffer.set_search_text(selected_text, 0)
 		else:
 			self._buffer.set_search_text("",0)
+	
+	def _remove_highlight(self):
+		self._buffer.set_search_text("",0)
 
 class HighlightSelected(gedit.Plugin):
 	def __init__(self):
