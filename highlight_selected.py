@@ -50,6 +50,7 @@ class WindowInstance:
 			
 	def _destroy_settings(self):
 		# Disconnect event handlers
+		self._buffer.disconnect(self._selection_change)
 		self._buffer.disconnect(self._mark_move)
 		
 		# Destroy references to previous tab
@@ -59,22 +60,27 @@ class WindowInstance:
 	def _selection_changed(self, *args):
 		if(self._buffer.get_has_selection()):
 			start, end = self._buffer.get_selection_bounds()
-			self._highlight_selected(start, end)
+			if(start.starts_word() and end.ends_word()):
+				self._highlight_selected(start, end)
 		else:
 			self._remove_highlight()
 		
 	def _mark_moved(self, textbuffer, textiter, mark):
 		if (mark.get_name() == 'insert'):
 			pos = self._buffer.get_iter_at_mark(mark)
-			self._end = pos
-			if (self._start != None and self._start != self._end):
-				self._highlight_selected(self._start, self._end)
-			else:
-				self._start = None
-				self._end   = None
+			if(pos.ends_word()):
+				self._end = pos
+				if (self._start != None and self._start != self._end):
+					self._highlight_selected(self._start, self._end)
+				else:
+					self._start = None
+					self._end   = None
 		elif (mark.get_name() == 'selection_bound'):
 			pos = self._buffer.get_iter_at_mark(mark)
-			self._start = pos
+			if (pos.starts_word()):
+				self._start = pos
+			elif (pos.ends_word()):
+				self._end = pos
 		else:
 			return False
 	
@@ -83,7 +89,7 @@ class WindowInstance:
 			selected_text = self._buffer.get_text(start, end)
 			self._buffer.set_search_text(selected_text, 0)
 		else:
-			self._buffer.set_search_text("",0)
+			self._remove_highlight()
 	
 	def _remove_highlight(self):
 		self._buffer.set_search_text("",0)
